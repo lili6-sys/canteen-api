@@ -20,4 +20,4 @@ class MenuItemUpdate(BaseModel):
 
 class MenuItemOut(MenuItemCreate):
     id: int
-    updated_at: datetimess
+    updated_at: datetime
