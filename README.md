@@ -46,3 +46,6 @@ npx newman run postman/Canteen-API.postman_collection.json \
 
 ### Newman
 ![Newman](docs/newman.png)
+
+### Newman (data-driven)
+![Newman data-driven](docs/newman2.png)
