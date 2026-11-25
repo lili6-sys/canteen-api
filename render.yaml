@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: canteen-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        sync: false   # nhập khóa thật trên trang quản trị, không ghi vào file
