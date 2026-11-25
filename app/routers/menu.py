@@ -1,3 +1,5 @@
+from fastapi import Depends
+from app.deps import require_staff
 from typing import Annotated, Literal
 from fastapi import APIRouter, HTTPException, Path, Query, Response, status
 from app.repository import repo
@@ -41,20 +43,23 @@ def get_item(item_id: ItemId):
     return get_or_404(item_id)
 
 @router.post("", response_model=MenuItemOut,
-             status_code=status.HTTP_201_CREATED, summary="Thêm món")
+             status_code=status.HTTP_201_CREATED, summary="Thêm món",
+             dependencies=[Depends(require_staff)])
 def create_item(payload: MenuItemCreate, response: Response):
     ensure_unique_name(payload.name)
     item = repo.add(payload.model_dump())
     response.headers["Location"] = f"/menu-items/{item['id']}"
     return item
 
-@router.put("/{item_id}", response_model=MenuItemOut, summary="Sửa toàn bộ")
+@router.put("/{item_id}", response_model=MenuItemOut, summary="Sửa toàn bộ",
+            dependencies=[Depends(require_staff)])
 def replace_item(item_id: ItemId, payload: MenuItemCreate):
     get_or_404(item_id)
     ensure_unique_name(payload.name, exclude_id=item_id)
     return repo.update(item_id, payload.model_dump())
 
-@router.patch("/{item_id}", response_model=MenuItemOut, summary="Sửa một phần")
+@router.patch("/{item_id}", response_model=MenuItemOut, summary="Sửa một phần",
+              dependencies=[Depends(require_staff)])
 def update_item(item_id: ItemId, payload: MenuItemUpdate):
     get_or_404(item_id)
     changes = payload.model_dump(exclude_unset=True)
@@ -63,7 +68,8 @@ def update_item(item_id: ItemId, payload: MenuItemUpdate):
     return repo.update(item_id, changes)
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT,
-               summary="Xóa món")
+               summary="Xóa món",
+               dependencies=[Depends(require_staff)])
 def delete_item(item_id: ItemId):
     get_or_404(item_id)
     repo.delete(item_id)
